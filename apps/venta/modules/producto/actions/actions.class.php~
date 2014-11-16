@@ -1,0 +1,337 @@
+<?php
+
+/**
+ * producto actions.
+ *
+ * @package    facturacion
+ * @subpackage producto
+ * @author     renny
+ * @version    SVN: $Id: actions.class.php 5125 2007-09-16 00:53:55Z dwhittle $
+ */
+class ProductoActions extends sfActions
+{
+
+  public function executeVerificar(sfWebRequest $request)
+  {
+  
+    $co_producto        = $this->getRequestParameter('co_producto');
+
+    $c = new Criteria();
+    $c->add(T07ProductoPeer::CO_PRODUCTO,$co_producto);
+    $stmt = T07ProductoPeer::doSelectStmt($c);
+
+    $registros = $stmt->fetch(PDO::FETCH_ASSOC);
+    $this->data = json_encode(array(
+        "success"   => true,
+        "data"      => $registros
+    ));
+    $this->setTemplate('store');
+  }
+
+  public function executeIndex(sfWebRequest $request)
+  {
+    $this->forward('producto', 'lista');
+  }
+
+  public function executeNuevo(sfWebRequest $request)
+  {
+    $this->forward('producto', 'editar');
+  }
+
+  public function executeFiltro(sfWebRequest $request)
+  {
+
+  }
+
+  public function executeEditar(sfWebRequest $request)
+  {
+    $codigo = $this->getRequestParameter("codigo");
+    if($codigo!=''||$codigo!=null){
+        $c = new Criteria();
+                $c->add(T07ProductoPeer::CO_PRODUCTO,$codigo);
+        
+        $stmt = T07ProductoPeer::doSelectStmt($c);
+        $campos = $stmt->fetch(PDO::FETCH_ASSOC);
+        $this->data = json_encode(array(
+                            "co_producto"     => $campos["co_producto"],
+                            "tx_producto"     => $campos["tx_producto"],
+                            "co_proveedor"     => $campos["co_proveedor"],
+                            "nu_precio"     => $campos["nu_precio"],
+                            "nu_procentaje_iva"     => $campos["nu_procentaje_iva"],
+                            "nu_precio_iva"     => $campos["nu_precio_iva"],
+                            "in_activo"     => $campos["in_activo"],
+                            "nu_stock"     => $campos["nu_stock"],
+                            "in_excento_iva"     => $campos["in_excento_iva"],
+                    ));
+    }else{
+        $this->data = json_encode(array(
+                            "co_producto"     => "",
+                            "tx_producto"     => "",
+                            "co_proveedor"     => "",
+                            "nu_precio"     => "",
+                            "nu_procentaje_iva"     => "",
+                            "nu_precio_iva"     => "",
+                            "in_activo"     => "",
+                            "nu_stock"     => "",
+                            "in_excento_iva"     => "",
+                    ));
+    }
+
+  }
+
+  public function executeGuardar(sfWebRequest $request)
+  {
+
+    $codigo = $this->getRequestParameter("co_producto");
+     if($codigo!=''||$codigo!=null){
+     $con = Propel::getConnection();
+     try
+      { 
+        $con->beginTransaction();
+        $t07_producto = T07ProductoPeer::retrieveByPk($codigo);
+        $t07_productoForm = $this->getRequestParameter('t07_producto');
+/*CAMPOS*/
+                                        
+/*Campo tipo VARCHAR */
+$t07_producto->setTxProducto($t07_productoForm["tx_producto"]);
+                                        
+/*Campo tipo INTEGER */
+$t07_producto->setCoProveedor($t07_productoForm["co_proveedor"]);
+                                        
+/*Campo tipo NUMERIC */
+$t07_producto->setNuPrecio($t07_productoForm["nu_precio"]);
+                                        
+/*Campo tipo NUMERIC */
+$t07_producto->setNuProcentajeIva($t07_productoForm["nu_procentaje_iva"]);
+                                        
+/*Campo tipo NUMERIC */
+$t07_producto->setNuPrecioIva($t07_productoForm["nu_precio_iva"]);
+                                        
+/*Campo tipo BOOLEAN */
+if (array_key_exists("in_activo", $t07_productoForm)){
+    $t07_producto->setInActivo(true);
+}else{
+    $t07_producto->setInActivo(false);
+}
+                                        
+/*Campo tipo NUMERIC */
+$t07_producto->setNuStock($t07_productoForm["nu_stock"]);
+                                        
+/*Campo tipo BOOLEAN */
+if (array_key_exists("in_excento_iva", $t07_productoForm)){
+    $t07_producto->setInExcentoIva(true);
+}else{
+    $t07_producto->setInExcentoIva(false);
+}
+                
+/*CAMPOS*/
+        $t07_producto->save($con);
+        $this->data = json_encode(array(
+                    "success" => true,
+                    "msg" => 'Modificación realizada exitosamente'
+                ));
+        $con->commit();
+      }catch (PropelException $e)
+      {
+        $con->rollback();
+        $this->data = json_encode(array(
+            "success" => false,
+            "msg" =>  $e->getMessage()
+        ));
+      }
+    }else{
+        $con = Propel::getConnection();
+        try{
+        $con->beginTransaction();
+        $t07_producto = new T07Producto();
+        $t07_productoForm = $this->getRequestParameter('t07_producto');
+
+/*CAMPOS*/
+                                        
+/*Campo tipo VARCHAR */
+$t07_producto->setTxProducto($t07_productoForm["tx_producto"]);
+                                        
+/*Campo tipo INTEGER */
+$t07_producto->setCoProveedor($t07_productoForm["co_proveedor"]);
+                                        
+/*Campo tipo NUMERIC */
+$t07_producto->setNuPrecio($t07_productoForm["nu_precio"]);
+                                        
+/*Campo tipo NUMERIC */
+$t07_producto->setNuProcentajeIva($t07_productoForm["nu_procentaje_iva"]);
+                                        
+/*Campo tipo NUMERIC */
+$t07_producto->setNuPrecioIva($t07_productoForm["nu_precio_iva"]);
+                                        
+/*Campo tipo BOOLEAN */
+if (array_key_exists("in_activo", $t07_productoForm)){
+    $t07_producto->setInActivo(true);
+}else{
+    $t07_producto->setInActivo(false);
+}
+                                        
+/*Campo tipo NUMERIC */
+$t07_producto->setNuStock($t07_productoForm["nu_stock"]);
+                                        
+/*Campo tipo BOOLEAN */
+if (array_key_exists("in_excento_iva", $t07_productoForm)){
+    $t07_producto->setInExcentoIva(true);
+}else{
+    $t07_producto->setInExcentoIva(false);
+}
+                
+/*CAMPOS*/
+
+        $t07_producto->save($con);
+            $this->data = json_encode(array(
+                "success" => true,
+                "msg" => 'Proceso realizado exitosamente.'
+            ));
+            $con->commit($con);
+        }catch (Exception $e){
+            $con->rollback();
+            $this->data = json_encode(array(
+                "success" => false,
+                "msg" =>  $e->getMessage()
+            ));
+        }
+    }
+  }
+
+  public function executeEliminar(sfWebRequest $request)
+  {
+	$codigo = $this->getRequestParameter("co_producto");
+	$con = Propel::getConnection();
+	try
+	{ 
+	$con->beginTransaction();
+	/*CAMPOS*/
+	$t07_producto = T07ProductoPeer::retrieveByPk($codigo);			
+	$t07_producto->delete($con);
+		$this->data = json_encode(array(
+			    "success" => true,
+			    "msg" => 'Registro Borrado con exito!'
+		));
+	$con->commit();
+	}catch (PropelException $e)
+	{
+	$con->rollback();
+		$this->data = json_encode(array(
+		    "success" => false,
+//		    "msg" =>  $e->getMessage()
+		    "msg" => 'Este registro no se puede borrar porque <br>se encuentra asociado a otros registros'
+		));
+	}
+  }
+
+  public function executeLista(sfWebRequest $request)
+  {
+
+  }
+
+  public function executeStorelista(sfWebRequest $request)
+  {
+    $paginar    =   $this->getRequestParameter("paginar");
+    $limit      =   $this->getRequestParameter("limit",20);
+    $start      =   $this->getRequestParameter("start",0);
+                $tx_producto      =   $this->getRequestParameter("query");
+                $co_producto      =   $this->getRequestParameter("query");
+            $co_proveedor      =   $this->getRequestParameter("co_proveedor");
+            $nu_precio      =   $this->getRequestParameter("nu_precio");
+            $nu_procentaje_iva      =   $this->getRequestParameter("nu_procentaje_iva");
+            $nu_precio_iva      =   $this->getRequestParameter("nu_precio_iva");
+            $in_activo      =   $this->getRequestParameter("in_activo");
+            $nu_stock      =   $this->getRequestParameter("nu_stock");
+            $in_excento_iva      =   $this->getRequestParameter("in_excento_iva");
+    
+    $c1 = new Criteria();
+
+    if($this->getRequestParameter("BuscarBy")=="true"){
+                                if($tx_producto!=""){$c1->add(T07ProductoPeer::TX_PRODUCTO,'%'.$tx_producto.'%',Criteria::LIKE);}
+
+                                if($co_producto!=""){$c1->add(T07ProductoPeer::CO_PRODUCTO,$co_producto);}
+                
+                                            if($co_proveedor!=""){$c1->add(T07ProductoPeer::CO_PROVEEDOR,$co_proveedor);}
+            
+                                            if($nu_precio!=""){$c1->add(T07ProductoPeer::NU_PRECIO,$nu_precio);}
+            
+                                            if($nu_procentaje_iva!=""){$c1->add(T07ProductoPeer::NU_PROCENTAJE_IVA,$nu_procentaje_iva);}
+            
+                                            if($nu_precio_iva!=""){$c1->add(T07ProductoPeer::NU_PRECIO_IVA,$nu_precio_iva);}
+            
+                                            
+                                            if($nu_stock!=""){$c1->add(T07ProductoPeer::NU_STOCK,$nu_stock);}
+            
+                                            
+                    }
+    $c1->setIgnoreCase(true);
+    $cantidadTotal = T07ProductoPeer::doCount($c1);
+
+    $c = new Criteria();
+
+    if($paginar=='si') $c->setLimit($limit)->setOffset($start);
+        $c->addAscendingOrderByColumn(T07ProductoPeer::CO_PRODUCTO);
+    
+    if($this->getRequestParameter("BuscarBy")=="true"){
+                                if($tx_producto!=""){$c->add(T07ProductoPeer::TX_PRODUCTO,'%'.$tx_producto.'%',Criteria::LIKE);}
+
+                                if($co_producto!=""){$c->add(T07ProductoPeer::CO_PRODUCTO,$co_producto);}
+        
+                                            if($co_proveedor!=""){$c->add(T07ProductoPeer::CO_PROVEEDOR,$co_proveedor);}
+    
+                                            if($nu_precio!=""){$c->add(T07ProductoPeer::NU_PRECIO,$nu_precio);}
+    
+                                            if($nu_procentaje_iva!=""){$c->add(T07ProductoPeer::NU_PROCENTAJE_IVA,$nu_procentaje_iva);}
+    
+                                            if($nu_precio_iva!=""){$c->add(T07ProductoPeer::NU_PRECIO_IVA,$nu_precio_iva);}
+    
+                                    
+                                            if($nu_stock!=""){$c->add(T07ProductoPeer::NU_STOCK,$nu_stock);}
+    
+                                    
+                    }
+    $c->setIgnoreCase(true);
+
+    $stmt = T07ProductoPeer::doSelectStmt($c);
+    $registros = "";
+    while($res = $stmt->fetch(PDO::FETCH_ASSOC)){
+    $registros[] = array(
+            "co_producto"     => trim($res["co_producto"]),
+            "tx_producto"     => trim($res["tx_producto"]),
+            "co_proveedor"     => trim($res["co_proveedor"]),
+            "nu_precio"     => trim($res["nu_precio"]),
+            "nu_procentaje_iva"     => trim($res["nu_procentaje_iva"]),
+            "nu_precio_iva"     => trim($res["nu_precio_iva"]),
+            "in_activo"     => trim($res["in_activo"]),
+            "nu_stock"     => trim($res["nu_stock"]),
+            "in_excento_iva"     => trim($res["in_excento_iva"]),
+        );
+    }
+
+    $this->data = json_encode(array(
+        "success"   =>  true,
+        "total"     =>  $cantidadTotal,
+        "data"      =>  $registros
+        ));
+    }
+
+                                //modelo fk t06_proveedor.CO_PROVEEDOR
+    public function executeStorefkcoproveedor(sfWebRequest $request){
+        $c = new Criteria();
+        $stmt = T06ProveedorPeer::doSelectStmt($c);
+        $registros = array();
+        while($reg = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $registros[] = $reg;
+        }
+
+        $this->data = json_encode(array(
+            "success"   =>  true,
+            "total"     =>  count($registros),
+            "data"      =>  $registros
+            ));
+        $this->setTemplate('store');
+    }
+                                                                                
+
+
+}

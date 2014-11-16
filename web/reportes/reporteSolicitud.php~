@@ -1,0 +1,181 @@
+<?php
+include("ConexionComun.php");
+include('fpdf.php');
+
+class PDF extends FPDF {
+    public $title;
+    public $conexion;
+    public $array_factura;
+    public $array_factura_banco;
+    function Header() {
+        encabezado($this,'h');        
+	$this->ln(3);
+        $this->Cell(0,10,'Pagina '.$this->PageNo().'/{nb}',0,0,'R');
+        
+        $this->SetX(10);
+        $this->Ln(5);
+        $this->SetFillColor(230, 230, 230);
+        $this->SetFont('Arial','B',6);
+        $this->SetAligns(array("C"));
+        $this->SetWidths(array(255));
+
+	/*if($_GET['tipo_reporte'] == 2) {
+		$h = " PENDIENTES";	
+	} elseif($_GET['tipo_reporte'] == 3) {
+		$h = " ENTREGADOS";
+	}*/
+        $this->ln();
+        $this->Row(array("LISTA DE SOLICITUDES ".$h),1,1);
+
+        $this->SetAligns(array("C","C","C","C","C","C",));
+        $this->SetWidths(array(10,20,20,50,50,30,25,25,25));
+        $this->Row(array("Nro","Nro. SOLICITUD","CEDULA/RIF",utf8_decode("RAZÓN SOCIAL"),"SOLICITUD","PARROQUIA","FECHA DE REGISTRO","FE. ENTREGA EST.","TELEFONO"),1,1);
+		  $this->SetAligns(array("C","C","L","L","L","L","C","C"));
+    }
+
+    function Footer() {
+         
+         $this->Cell(0,10,'Fecha '.date('d/m/Y'),0,0,'R');
+	$this->SetFont('Arial','',9);     
+	$this->SetY(-10);
+	$this->Cell(0,0,utf8_decode('www.ciudaddeprogreso.org.ve / www.sedebat.com'),0,0,'C'); 
+    }
+
+    function dwawCell($title,$data) {
+        $width = 8;
+        $this->SetFont('Arial','B',12);
+        $y =  $this->getY() * 20;
+        $x =  $this->getX();
+        $this->SetFillColor(206,230,100);
+        $this->MultiCell(175,8,$title,0,1,'L',0);
+        $this->SetY($y);
+        $this->SetFont('Arial','',12);
+        $this->SetFillColor(206,230,172);
+        $w=$this->GetStringWidth($title)+3;
+        $this->SetX($x+$w);
+        $this->SetFillColor(206,230,172);
+        $this->MultiCell(175,8,$data,0,1,'J',0);
+
+    }
+
+    function ChapterBody() {       
+        $this->getSolicitudes();
+    }
+
+    function ChapterTitle($num,$label) {
+        $this->SetFont('Arial','',10);
+        $this->SetFillColor(200,220,255);
+        $this->Cell(0,6,"$label",0,1,'L',1);
+        $this->Ln(8);
+    }
+
+    function SetTitle($title) {
+        $this->title   = $title;
+    }
+
+    function PrintChapter() {
+        $this->AddPage();
+        $this->ChapterBody();
+    }
+
+    function getSolicitudes(){
+
+          $conex = new ConexionComun();
+          $condicion = '';
+          
+          if($_GET['co_parroquia'] != '')
+          {
+            $condicion.= "t4.co_parroquia = ".$_GET['co_parroquia']." and ";
+	    
+          } 	
+
+	       if($_GET['co_instituto']!='')
+          {
+              $condicion.= "t4.co_instituto = ".$_GET['co_instituto']." and ";
+          }
+          
+          if($_GET['co_tipo_solicitud'] != '')
+          {
+            $condicion.= "t4.co_tipo_solicitud = ".$_GET['co_tipo_solicitud']." and ";
+	    
+          } 	
+
+
+          if($_GET['co_estatus'] != '')
+          {
+            $condicion.= "t4.co_estatus = ".$_GET['co_estatus']." and ";
+	    
+          } 
+
+	  if($_GET['co_documento'] != '')
+          {
+            $condicion.= "t1.co_documento = ".$_GET['co_documento']." and ";	    
+          }
+
+	if($_GET['co_estatus']==4)
+	{
+
+          if($_GET['fe_desde']!='')
+          {
+              $condicion.= "t4.fecha_entrega_real >='".$_GET['fe_desde']."' and ";
+          }
+          if($_GET['fe_hasta']!='')
+          {
+              $condicion.= "t4.fecha_entrega_real <='".$_GET['fe_hasta']."' and ";
+          }
+	
+	}else{
+          if($_GET['fe_desde']!='')
+          {
+              $condicion.= "t4.fecha_recepcion >='".$_GET['fe_desde']."' and ";
+          }
+          if($_GET['fe_hasta']!='')
+          {
+              $condicion.= "t4.fecha_recepcion <='".$_GET['fe_hasta']."' and ";
+          }
+	}	
+
+          $sql = "SELECT t4.co_solicitud, t4.co_contribuyente, t1.co_documento, t2.tipo, 
+        CASE
+            WHEN t1.tx_rif::text IS NULL THEN (t2.inicial::text || '-'::text) || t1.nu_cedula::text
+            ELSE (t2.inicial::text || '-'::text) || t1.tx_rif::text
+        END AS cedula_rif, 
+        CASE
+            WHEN t1.tx_rif::text IS NULL THEN t1.nu_cedula::text
+            ELSE t1.tx_rif::text
+        END AS nu_documento, 
+        CASE
+            WHEN t1.tx_razon_social::text IS NULL THEN (((upper(t1.nb_persona::text) || ' '::text) || upper(t1.ap_persona::text))::character varying)::text
+            ELSE upper(t1.tx_razon_social::text)
+        END AS contribuyente, t1.telef_movil, t1.telef_habitacion, t4.co_instituto, t6.tx_instituto, t4.co_tipo_solicitud, upper(t5.tx_tipo_solicitud::text) AS tx_tipo_solicitud, to_char(t4.fecha_recepcion::timestamp with time zone, 'dd/mm/yyyy'::text) AS fecha_recepcion, to_char(t4.fecha_entrega_est::timestamp with time zone, 'dd/mm/yyyy'::text) AS fecha_entrega_est, to_char(t4.fecha_entrega_real::timestamp with time zone, 'dd/mm/yyyy'::text) AS fecha_entrega_real, t4.observacion, t4.co_parroquia, upper(t3.tx_parroquia::text) AS tx_parroquia, upper(t4.tx_direccion::text) AS tx_direccion, t4.co_estatus, t7.tx_estatus, t4.nu_cedula_entrega, t4.nb_persona_entrega, t4.observacion_rezagado, t4.co_usuario, (t8.nb_usuario::text || ' '::text) || t8.ap_usuario::text AS nombre_usuario
+   FROM t15_solicitud t4
+   JOIN t14_contribuyente t1 ON t4.co_contribuyente = t1.co_contribuyente
+   JOIN t11_documento t2 ON t1.co_documento = t2.co_documento
+   JOIN t06_parroquia t3 ON t1.co_parroquia = t3.co_parroquia
+   JOIN t09_tipo_solicitud t5 ON t4.co_tipo_solicitud = t5.co_tipo_solicitud
+   JOIN t05_instituto t6 ON t4.co_instituto = t6.co_instituto
+   JOIN t12_estatus t7 ON t4.co_estatus = t7.co_estatus
+   JOIN t01_usuario t8 ON t4.co_usuario = t8.co_usuario
+  WHERE $condicion t4.co_contribuyente = t1.co_contribuyente
+	order by t4.co_solicitud,tx_parroquia";
+          //echo $sql;exit();
+          $this->datos = $conex->ObtenerFilasBySqlSelect($sql);
+
+//          echo base64_decode($_GET['codigo']);
+//          exit();
+          $i=1;
+          foreach($this->datos as $key => $campo){
+              
+               $this->SetAligns(array("C","C","L","L","L","L","C","C"));
+               $this->SetWidths(array(10,20,20,50,50,30,25,25,25));
+               $this->Row(array($i,$campo['co_solicitud'],$campo['cedula_rif'],utf8_decode($campo['contribuyente']),utf8_decode($campo['tx_tipo_solicitud']),utf8_decode($campo['tx_parroquia']),$campo['fecha_recepcion'],$campo['fecha_entrega_est'],$campo['telef_habitacion'].' '.$campo['telef_movil']));
+               $i++;
+          }
+    }
+}
+$pdf=new PDF('L','mm','letter');
+$pdf->AliasNbPages();
+$pdf->PrintChapter();
+$pdf->SetDisplayMode('default');
+$pdf->Output();
+?>

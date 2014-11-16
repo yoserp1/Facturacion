@@ -1,0 +1,108 @@
+propel:
+  _attributes:
+    package: lib.model
+    defaultIdMethod: native
+  t01_usuario:
+    _attributes: { phpName: T01Usuario }
+    co_usuario: { type: INTEGER, primaryKey: true, autoIncrement: true, required: true }
+    nb_usuario: { type: VARCHAR, size: '50', required: true }
+    ap_usuario: { type: VARCHAR, size: '50', required: true }
+    nu_cedula: { type: NUMERIC, required: true }
+    tx_login: { type: VARCHAR, size: '50', required: true }
+    tx_password: { type: VARCHAR, required: true }
+    co_rol: { type: INTEGER, required: true, foreignTable: t02_rol, foreignReference: co_rol, onDelete: CASCADE, onUpdate: CASCADE }
+    in_activo: { type: BOOLEAN, required: true }
+  t02_rol:
+    _attributes: { phpName: T02Rol }
+    co_rol: { type: INTEGER, primaryKey: true, autoIncrement: true, required: true }
+    tx_rol: { type: VARCHAR, size: '100', required: true }
+  t03_menu:
+    _attributes: { phpName: T03Menu }
+    co_menu: { type: BIGINT, primaryKey: true, autoIncrement: true, required: true }
+    tx_menu: { type: VARCHAR, size: '50', required: false }
+    co_padre: { type: BIGINT, required: false }
+    tx_href: { type: VARCHAR, size: '100', required: false }
+    co_sub_menu: { type: VARCHAR, size: '50', required: false }
+    tx_icono: { type: VARCHAR, required: false }
+    nu_orden: { type: INTEGER, required: false }
+  t04_rolmenu:
+    _attributes: { phpName: T04Rolmenu }
+    co_rolmenu: { type: INTEGER, primaryKey: true, autoIncrement: true, required: true }
+    co_menu: { type: INTEGER, required: true, foreignTable: t03_menu, foreignReference: co_menu, onDelete: CASCADE, onUpdate: CASCADE }
+    co_rol: { type: INTEGER, required: true, foreignTable: t02_rol, foreignReference: co_rol, onDelete: CASCADE, onUpdate: CASCADE }
+    in_ver: { type: BOOLEAN, required: true }
+  t05_documento:
+    _attributes: { phpName: T05Documento }
+    co_documento: { type: INTEGER, primaryKey: true, autoIncrement: true, required: true }
+    tx_documento: { type: VARCHAR, required: true }
+    tx_tipo: { type: VARCHAR, required: true }
+  t06_proveedor:
+    _attributes: { phpName: T06Proveedor }
+    co_proveedor: { type: BIGINT, primaryKey: true, autoIncrement: true, required: true }
+    co_documento: { type: INTEGER, required: true, foreignTable: t05_documento, foreignReference: co_documento, onDelete: RESTRICT, onUpdate: CASCADE }
+    tx_dni: { type: VARCHAR, required: true }
+    tx_nombre: { type: VARCHAR, required: true }
+    tx_direccion: { type: VARCHAR, required: false }
+    tx_telefono: { type: VARCHAR, required: true }
+    _uniques: { t06_proveedor_tx_dni_key: [tx_dni] }
+  t07_producto:
+    _attributes: { phpName: T07Producto }
+    co_producto: { type: BIGINT, primaryKey: true, autoIncrement: true, required: true }
+    tx_producto: { type: VARCHAR, required: true }
+    co_proveedor: { type: INTEGER, required: true, foreignTable: t06_proveedor, foreignReference: co_proveedor, onDelete: RESTRICT, onUpdate: CASCADE }
+    nu_precio: { type: NUMERIC, size: '10', scale: '2', required: true }
+    nu_procentaje_iva: { type: NUMERIC, size: '3', scale: '0', required: true }
+    nu_precio_iva: { type: NUMERIC, size: '10', scale: '2', required: true }
+    in_activo: { type: BOOLEAN, required: false }
+    nu_stock: { type: NUMERIC, required: false }
+    in_excento_iva: { type: BOOLEAN, required: false }
+  t08_pedido:
+    _attributes: { phpName: T08Pedido }
+    co_pedido: { type: BIGINT, primaryKey: true, autoIncrement: true, required: true }
+    co_proveedor: { type: INTEGER, required: true, foreignTable: t06_proveedor, foreignReference: co_proveedor, onDelete: RESTRICT, onUpdate: CASCADE }
+    fe_pedido: { type: DATE, required: true }
+  t09_pedido_detalle:
+    _attributes: { phpName: T09PedidoDetalle }
+    co_pedido_detalle: { type: BIGINT, primaryKey: true, autoIncrement: true, required: true }
+    co_pedido: { type: INTEGER, required: true, foreignTable: t08_pedido, foreignReference: co_pedido, onDelete: CASCADE, onUpdate: CASCADE }
+    co_producto: { type: INTEGER, required: true, foreignTable: t07_producto, foreignReference: co_producto, onDelete: RESTRICT, onUpdate: CASCADE }
+    cn_producto: { type: NUMERIC, required: false }
+    mo_viejo: { type: NUMERIC, size: '10', scale: '2', required: true }
+    mo_nuevo: { type: NUMERIC, size: '10', scale: '2', required: true }
+  t10_cliente:
+    _attributes: { phpName: T10Cliente }
+    co_cliente: { type: BIGINT, primaryKey: true, autoIncrement: true, required: true }
+    co_documento: { type: INTEGER, required: true, foreignTable: t05_documento, foreignReference: co_documento, onDelete: RESTRICT, onUpdate: CASCADE }
+    tx_dni: { type: VARCHAR, required: true }
+    tx_nombre: { type: VARCHAR, required: true }
+    tx_direccion: { type: VARCHAR, required: true }
+    tx_telefono: { type: VARCHAR, required: true }
+    nu_limite_credito: { type: NUMERIC, required: false }
+    _uniques: { t10_cliente_tx_dni_key: [tx_dni] }
+  t11_tipo_factura:
+    _attributes: { phpName: T11TipoFactura }
+    co_tipo_factura: { type: INTEGER, primaryKey: true, autoIncrement: true, required: true }
+    tx_tipo_factura: { type: VARCHAR, required: true }
+  t12_factura:
+    _attributes: { phpName: T12Factura }
+    co_factura: { type: BIGINT, primaryKey: true, autoIncrement: true, required: true }
+    co_cliente: { type: INTEGER, required: true, foreignTable: t10_cliente, foreignReference: co_cliente, onDelete: RESTRICT, onUpdate: CASCADE }
+    fe_factura: { type: DATE, required: true }
+    nu_iva: { type: NUMERIC, size: '10', scale: '2', required: false }
+    mo_neto: { type: NUMERIC, size: '10', scale: '2', required: false }
+    mo_iva: { type: NUMERIC, size: '10', scale: '2', required: false }
+    mo_total: { type: NUMERIC, size: '10', scale: '2', required: false }
+    co_usuario: { type: INTEGER, required: true }
+    co_tipo_factura: { type: INTEGER, required: true, foreignTable: t11_tipo_factura, foreignReference: co_tipo_factura, onUpdate: CASCADE }
+    fecha_creacion: { type: TIMESTAMP, required: true }
+  t13_factura_detalle:
+    _attributes: { phpName: T13FacturaDetalle }
+    co_factura_detalle: { type: BIGINT, primaryKey: true, autoIncrement: true, required: true }
+    co_factura: { type: BIGINT, required: true, foreignTable: t12_factura, foreignReference: co_factura, onDelete: CASCADE, onUpdate: CASCADE }
+    co_producto: { type: INTEGER, required: true, foreignTable: t07_producto, foreignReference: co_producto, onDelete: RESTRICT, onUpdate: CASCADE }
+    mo_unitario: { type: NUMERIC, size: '10', scale: '2', required: true }
+    nu_cantidad: { type: NUMERIC, required: true }
+    nu_iva: { type: NUMERIC, size: '10', scale: '2', required: false }
+    mo_neto: { type: NUMERIC, size: '10', scale: '2', required: false }
+    mo_iva: { type: NUMERIC, size: '10', scale: '2', required: false }
+    mo_total: { type: NUMERIC, size: '10', scale: '2', required: false }

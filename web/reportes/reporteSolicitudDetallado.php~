@@ -1,0 +1,257 @@
+<?php
+include("ConexionComun.php");
+include('fpdf.php');
+
+
+class PDF extends FPDF {
+    public $title;
+    public $conexion;
+    public $array_factura;
+    public $array_factura_banco;
+    function Header() {
+
+        encabezado($this,'h');        
+	$this->ln(3);
+        $this->Cell(0,10,'Pagina '.$this->PageNo().'/{nb}',0,0,'R');
+        
+        
+
+	/*if($_GET['tipo_reporte'] == 2) {
+		$h = " PENDIENTES";	
+	} elseif($_GET['tipo_reporte'] == 3) {
+		$h = " ENTREGADOS";
+	}*/
+        
+
+    }
+
+    function Footer() {
+         
+         $this->Cell(0,10,'Fecha '.date('d/m/Y'),0,0,'R');
+	$this->SetFont('Arial','',9);     
+	$this->SetY(-10);
+	$this->Cell(0,0,utf8_decode('www.ciudaddeprogreso.org.ve / www.sedebat.com'),0,0,'C'); 
+    }
+
+    function dwawCell($title,$data) {
+        $width = 8;
+        $this->SetFont('Arial','B',12);
+        $y =  $this->getY() * 20;
+        $x =  $this->getX();
+        $this->SetFillColor(206,230,100);
+        $this->MultiCell(175,8,$title,0,1,'L',0);
+        $this->SetY($y);
+        $this->SetFont('Arial','',12);
+        $this->SetFillColor(206,230,172);
+        $w=$this->GetStringWidth($title)+3;
+        $this->SetX($x+$w);
+        $this->SetFillColor(206,230,172);
+        $this->MultiCell(175,8,$data,0,1,'J',0);
+
+    }
+
+    function ChapterBody() {
+
+        
+        $this->getSolicitudes();
+
+    }
+
+    function ChapterTitle($num,$label) {
+        $this->SetFont('Arial','',10);
+        $this->SetFillColor(200,220,255);
+        $this->Cell(0,6,"$label",0,1,'L',1);
+        $this->Ln(8);
+    }
+
+    function SetTitle($title) {
+        $this->title   = $title;
+    }
+
+    function PrintChapter() {
+        $this->AddPage();
+        $this->ChapterBody();
+    }
+
+    function getSolicitudes(){
+
+          $conex = new ConexionComun();
+
+          $condicion = '';
+          
+          if($_GET['co_parroquia'] != '')
+          {
+            $condicion.= "ds.co_parroquia = ".$_GET['co_parroquia']." and ";
+	    
+          } 	
+
+	       if($_GET['co_instituto']!='')
+          {
+              $condicion.= "ds.co_instituto = ".$_GET['co_instituto']." and ";
+          }
+          
+          if($_GET['co_tipo_solicitud'] != '')
+          {
+            $condicion.= "ds.co_tipo_solicitud = ".$_GET['co_tipo_solicitud']." and ";
+	    
+          } 	
+
+
+          if($_GET['co_estatus'] != '')
+          {
+            $condicion.= "ds.co_estatus = ".$_GET['co_estatus']." and ";
+	    
+          } 
+
+	if($_GET['co_estatus']==4)
+	{
+
+          if($_GET['fe_desde']!='')
+          {
+              $condicion.= "ds.fecha_entrega_real >='".$_GET['fe_desde']."' and ";
+          }
+          if($_GET['fe_hasta']!='')
+          {
+              $condicion.= "ds.fecha_entrega_real <='".$_GET['fe_hasta']."' and ";
+          }
+	
+	}else{
+          if($_GET['fe_desde']!='')
+          {
+              $condicion.= "ds.fecha_recepcion >='".$_GET['fe_desde']."' and ";
+          }
+          if($_GET['fe_hasta']!='')
+          {
+              $condicion.= "ds.fecha_recepcion <='".$_GET['fe_hasta']."' and ";
+          }
+	}
+
+          $sql = "select count(co_solicitud) as cantidad,tx_tipo_solicitud,	             
+                     upper(tx_instituto) as nb_instituto,
+	             inst.co_instituto
+		 from t15_solicitud as ds, 
+		      t09_tipo_solicitud as tpsol, 
+                      t06_parroquia as p,
+		      t05_instituto as inst
+		 where $condicion  
+		 tpsol.co_instituto = inst.co_instituto and 
+	         p.co_parroquia = ds.co_parroquia and
+                 tpsol.co_tipo_solicitud = ds.co_tipo_solicitud  		 
+		 group by tx_tipo_solicitud,nb_instituto,inst.co_instituto
+		 order by 2 asc";
+	 // echo $sql; exit();
+          $this->datos = $conex->ObtenerFilasBySqlSelect($sql);
+
+	  $sql_parroquia = "select count(ds.co_parroquia) as cantidad,tx_parroquia,tx_tipo_solicitud,tx_instituto
+			 from t15_solicitud ds, t09_tipo_solicitud as tpsol, t06_parroquia as p,
+			      t05_instituto as inst 
+			 where $condicion tpsol.co_instituto = inst.co_instituto and 
+			 p.co_parroquia = ds.co_parroquia and tpsol.co_tipo_solicitud = ds.co_tipo_solicitud 
+			 group by tx_tipo_solicitud,tx_instituto,tx_parroquia
+			 order by 3 asc";
+	 
+          $this->datos_parroquia = $conex->ObtenerFilasBySqlSelect($sql_parroquia);
+
+          $i=1;
+
+          $total = 0;
+	  $instituto = '';
+	  $solicitud= '';
+	  $co_instituto = '';
+          foreach($this->datos as $key => $campo){
+               
+	       if($campo["co_instituto"]!=$co_instituto){
+
+		  
+	           $co_instituto = $campo["co_instituto"];
+		   $instituto = $campo["tx_instituto"];
+		   $this->SetX(10);
+		   $this->Ln(10);
+		   $this->SetFillColor(230, 230, 230);
+		   $this->SetFont('Arial','B',12);
+		   $this->SetAligns(array("C"));
+		   $this->SetWidths(array(210));
+		   $this->ln();		
+		   
+		   $this->Row(array("LISTA DE SOLICITUDES ".utf8_decode($instituto)),1,1);
+		   $this->SetAligns(array("C","C"));
+		   $this->SetWidths(array(30,180));
+		   $this->Row(array("Cantidad","SOLICITUD"),1,1);
+		   $this->SetAligns(array("C","L"));
+	       }
+
+               $this->SetAligns(array("C","L"));
+               $this->SetWidths(array(30,180));
+               $this->Row(array($campo['cantidad'],utf8_decode($campo['tx_tipo_solicitud'])));
+               $i++;
+	       $total = $total + $campo['cantidad'];
+	       
+                if($this->getY()>170){
+				      $this->addPage();
+				      $this->SetX(10);	
+				      $this->ln();
+                }	       
+          }
+
+	   $this->SetAligns(array("C"));
+			  $this->SetWidths(array(30));
+			  $this->Row(array($total));
+			  $total=0;
+	  
+
+	  /*****Por Parroquia****/
+			  // $this->addPage();
+			   $instituto = $campo["nb_instituto"];
+			   //$this->SetX(10);
+			   $this->Ln(10);
+			   $this->SetFillColor(230, 230, 230);
+			   $this->SetFont('Arial','B',12);
+			   $this->SetAligns(array("C"));
+			   $this->SetWidths(array(210));
+			   $this->SetX(10);	
+			   $this->Row(array("LISTA DE SOLICITUDES POR PARROQUIA ".utf8_decode($instituto)),1,1);
+
+		           foreach($this->datos_parroquia as $key2 => $campo2){
+				   $this->SetX(10);
+				   if($this->getY()>170){
+				      $this->addPage();
+				      $this->SetX(10);	
+				      $this->ln();
+				   }
+			           if($solicitud!=$campo2["tx_tipo_solicitud"])
+		                   {					   
+					   $solicitud = $campo2["tx_tipo_solicitud"];
+					   $this->SetFillColor(230, 230, 230);
+					   $this->SetFont('Arial','B',12);
+					   $this->SetAligns(array("L"));
+					   $this->SetWidths(array(210));
+					   $this->ln();
+					   $this->SetX(10);		
+					   $this->Row(array("SOLICITUD: ".utf8_decode($campo2["tx_tipo_solicitud"])),1,1);
+
+					   $this->SetAligns(array("C","C","C"));
+				           $this->SetWidths(array(30,180));
+					   $this->SetX(10);
+				           $this->Row(array("Cantidad","PARROQUIA"),1,1);
+				           $this->SetAligns(array("C","L","L"));
+					  
+				   }
+				   
+				   $this->SetX(10);	
+				   $this->SetAligns(array("C","L","L"));
+				   $this->SetWidths(array(30,180));
+				   $this->Row(array($campo2['cantidad'],utf8_decode($campo2['tx_parroquia'])));
+				   $i++;
+			      // $total = $total + $campo2['cantidad'];
+		           }
+
+	      /***********************/
+    }
+}
+
+$pdf=new PDF('L','mm','letter');
+$pdf->AliasNbPages();
+$pdf->PrintChapter();
+$pdf->SetDisplayMode('default');
+$pdf->Output();
+?>

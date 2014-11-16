@@ -1,0 +1,6 @@
+all:
+  is_secure: on
+validar:
+  is_secure: off
+imagen:
+  is_secure: off

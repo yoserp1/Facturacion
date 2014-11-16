@@ -1,0 +1,83 @@
+<script type="text/javascript">
+Ext.ns('datos');
+datos.main = {
+init: function(){
+
+this.OBJ = paqueteComunJS.funcion.doJSON({stringData:'<?php echo $data ?>'});
+
+this.datos2 = '<p class="registro_detalle"><b>Cedula / Rif: </b>'+this.OBJ.co_documento+'-'+this.OBJ.tx_dni+'</p>';
+this.datos2 +='<p class="registro_detalle"><b>Nombre y Apellido: </b>'+this.OBJ.tx_nombre+'</p>';
+this.datos2 +='<p class="registro_detalle"><b>Direccion: </b>'+this.OBJ.tx_direccion+'</p>';
+this.datos2 +='<p class="registro_detalle"><b>Telefono Movil: </b>'+this.OBJ.tx_telefono+'<b> Limite de Credito: </b>'+this.OBJ.nu_limite_credito+'</p>';
+
+this.fieldDatos2 = new Ext.form.FieldSet({
+	title: 'Datos del Cliente',
+	html: this.datos2
+});
+
+//Editar un registro
+this.editar= new Ext.Button({
+    text:'Editar Cliente',
+    iconCls: 'icon-editar',
+    handler:function(){
+	this.codigo  = clienteLista.main.gridPanel_.getSelectionModel().getSelected().get('co_cliente');
+	clienteLista.main.mascara.show();
+        this.msg = Ext.get('formulariocliente');
+        this.msg.load({
+         url:"<?php echo $_SERVER["SCRIPT_NAME"] ?>/cliente/editar/codigo/"+this.codigo,
+         scripts: true,
+         text: "Cargando.."
+        });
+    }
+});
+
+this.imprimir = new Ext.Button({
+	text:'Imprimir Factura',
+	id:'imprimirPlanilla',
+	iconCls: 'icon-pdf',
+	handler: function(boton){
+		  var vco_factura  = facturaLista.main.gridPanel_.getSelectionModel().getSelected().get('co_factura');
+		  window.open("../reportes/factura?codigo="+vco_factura);
+	}
+});
+
+this.formpanel = new Ext.form.FormPanel({
+	bodyStyle: 'padding:10px',
+	autoWidth:true,
+	autoHeight:true,
+        border:false,
+        tbar:[
+		this.editar,'-',this.imprimir
+        ],
+	items:[
+		this.fieldDatos2		
+		]
+});
+
+	this.tabuladores = new Ext.TabPanel({
+		resizeTabs:true, // turn on tab resizing
+		minTabWidth: 115,
+		tabWidth:150,border:false,
+		enableTabScroll:true,
+		width:500,
+		autoHeight:250,
+		activeTab: 0,
+		defaults: {autoScroll:true},
+		items:[
+			{
+				title: 'Facturas Asociadas',
+//				disabled:true,
+				autoLoad:{
+				url:'<?= $_SERVER["SCRIPT_NAME"] ?>/cliente/factura',
+				scripts: true,
+				params:{co_periodo_censo:this.OBJ.co_cliente}
+				}
+			}
+		]
+	});
+
+        this.tabuladores.render('detalle');
+}
+}
+Ext.onReady(datos.main.init, datos.main);
+</script>

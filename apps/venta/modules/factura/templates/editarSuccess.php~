@@ -1,0 +1,215 @@
+<script type="text/javascript">
+Ext.ns("facturaEditar");
+facturaEditar.main = {
+init:function(){
+
+this.OBJ = paqueteComunJS.funcion.doJSON({stringData:'<?php echo $data ?>'});
+//<Stores de fk>
+this.storeCO_CLIENTE = this.getStoreCO_CLIENTE();
+//<Stores de fk>
+//<Stores de fk>
+this.storeCO_USUARIO = this.getStoreCO_USUARIO();
+//<Stores de fk>
+
+//<ClavePrimaria>
+this.co_factura = new Ext.form.Hidden({
+    name:'co_factura',
+    value:this.OBJ.co_factura});
+//</ClavePrimaria>
+
+
+this.co_cliente = new Ext.form.ComboBox({
+	fieldLabel:'Co cliente',
+	store: this.storeCO_CLIENTE,
+	typeAhead: true,
+	valueField: 'co_cliente',
+	displayField:'co_cliente',
+	hiddenName:'t12_factura[co_cliente]',
+	//readOnly:(this.OBJ.co_cliente!='')?true:false,
+	//style:(this.OBJ.co_cliente!='')?'background:#c9c9c9;':'',
+	forceSelection:true,
+	resizable:true,
+	triggerAction: 'all',
+	emptyText:'Seleccione co_cliente',
+	selectOnFocus: true,
+	mode: 'local',
+	width:200,
+	resizable:true,
+	allowBlank:false
+});
+this.storeCO_CLIENTE.load();
+	paqueteComunJS.funcion.seleccionarComboByCo({
+	objCMB: this.co_cliente,
+	value:  this.OBJ.co_cliente,
+	objStore: this.storeCO_CLIENTE
+});
+
+this.fe_factura = new Ext.form.DateField({
+	fieldLabel:'Fe factura',
+	name:'t12_factura[fe_factura]',
+	value:this.OBJ.fe_factura,
+	allowBlank:false
+});
+
+this.nu_iva = new Ext.form.NumberField({
+	fieldLabel:'Nu iva',
+	name:'t12_factura[nu_iva]',
+	value:this.OBJ.nu_iva,
+	allowBlank:false
+});
+
+this.mo_neto = new Ext.form.NumberField({
+	fieldLabel:'Mo neto',
+	name:'t12_factura[mo_neto]',
+	value:this.OBJ.mo_neto,
+	allowBlank:false
+});
+
+this.mo_total = new Ext.form.NumberField({
+	fieldLabel:'Mo total',
+	name:'t12_factura[mo_total]',
+	value:this.OBJ.mo_total,
+	allowBlank:false
+});
+
+this.co_usuario = new Ext.form.ComboBox({
+	fieldLabel:'Co usuario',
+	store: this.storeCO_USUARIO,
+	typeAhead: true,
+	valueField: 'co_usuario',
+	displayField:'co_usuario',
+	hiddenName:'t12_factura[co_usuario]',
+	//readOnly:(this.OBJ.co_usuario!='')?true:false,
+	//style:(this.OBJ.co_usuario!='')?'background:#c9c9c9;':'',
+	forceSelection:true,
+	resizable:true,
+	triggerAction: 'all',
+	emptyText:'Seleccione co_usuario',
+	selectOnFocus: true,
+	mode: 'local',
+	width:200,
+	resizable:true,
+	allowBlank:false
+});
+this.storeCO_USUARIO.load();
+	paqueteComunJS.funcion.seleccionarComboByCo({
+	objCMB: this.co_usuario,
+	value:  this.OBJ.co_usuario,
+	objStore: this.storeCO_USUARIO
+});
+
+this.in_iva = new Ext.form.Checkbox({
+	fieldLabel:'In iva',
+	name:'t12_factura[in_iva]',
+	checked:(this.OBJ.in_iva=='1') ? true:false,
+	allowBlank:false
+});
+
+this.guardar = new Ext.Button({
+    text:'Guardar',
+    iconCls: 'icon-guardar',
+    handler:function(){
+
+        if(!facturaEditar.main.formPanel_.getForm().isValid()){
+            Ext.Msg.alert("Alerta","Debe ingresar los campos en rojo");
+            return false;
+        }
+        facturaEditar.main.formPanel_.getForm().submit({
+            method:'POST',
+            url:'<?php echo $_SERVER["SCRIPT_NAME"] ?>/factura/guardar',
+            waitMsg: 'Enviando datos, por favor espere..',
+            waitTitle:'Enviando',
+            failure: function(form, action) {
+                Ext.MessageBox.alert('Error en transacción', action.result.msg);
+            },
+            success: function(form, action) {
+                 if(action.result.success){
+                     Ext.MessageBox.show({
+                         title: 'Mensaje',
+                         msg: action.result.msg,
+                         closable: false,
+                         icon: Ext.MessageBox.INFO,
+                         resizable: false,
+			 animEl: document.body,
+                         buttons: Ext.MessageBox.OK
+                     });
+                 }
+                 facturaLista.main.store_lista.load();
+                 facturaEditar.main.winformPanel_.hide();
+             }
+        });
+
+   
+    }
+});
+
+this.salir = new Ext.Button({
+    text:'Salir',
+//    iconCls: 'icon-cancelar',
+    handler:function(){
+        facturaEditar.main.winformPanel_.close();
+    }
+});
+
+this.formPanel_ = new Ext.form.FormPanel({
+    frame:true,
+    width:400,
+autoHeight:true,  
+    autoScroll:true,
+    bodyStyle:'padding:10px;',
+    items:[
+
+                    this.co_factura,
+                    this.co_cliente,
+                    this.fe_factura,
+                    this.nu_iva,
+                    this.mo_neto,
+                    this.mo_total,
+                    this.co_usuario,
+                    this.in_iva,
+            ]
+});
+
+this.winformPanel_ = new Ext.Window({
+    title:'Formulario: factura',
+    modal:true,
+    constrain:true,
+width:400,
+    frame:true,
+    closabled:true,
+    autoHeight:true,
+    items:[
+        this.formPanel_
+    ],
+    buttons:[
+        this.guardar,
+        this.salir
+    ],
+    buttonAlign:'center'
+});
+this.winformPanel_.show();
+facturaLista.main.mascara.hide();
+}
+,getStoreCO_CLIENTE:function(){
+    this.store = new Ext.data.JsonStore({
+        url:'<?php echo $_SERVER["SCRIPT_NAME"] ?>/factura/storefkcocliente',
+        root:'data',
+        fields:[
+            {name: 'co_cliente'}
+            ]
+    });
+    return this.store;
+}
+,getStoreCO_USUARIO:function(){
+    this.store = new Ext.data.JsonStore({
+        url:'<?php echo $_SERVER["SCRIPT_NAME"] ?>/factura/storefkcousuario',
+        root:'data',
+        fields:[
+            {name: 'co_usuario'}
+            ]
+    });
+    return this.store;
+}
+};
+Ext.onReady(facturaEditar.main.init, facturaEditar.main);
+</script>

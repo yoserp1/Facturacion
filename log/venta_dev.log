@@ -1,0 +1,60 @@
+Jul 30 18:06:01 symfony [info] {sfPatternRouting} Connect sfRoute "homepage" (/)
+Jul 30 18:06:01 symfony [info] {sfPatternRouting} Connect sfRoute "default_index" (/:module)
+Jul 30 18:06:01 symfony [info] {sfPatternRouting} Connect sfRoute "default" (/:module/:action/*)
+Jul 30 18:06:01 symfony [info] {sfPatternRouting} Match route "homepage" (/) for / with parameters array (  'module' => 'login',  'action' => 'index',)
+Jul 30 18:07:46 symfony [info] {sfPatternRouting} Connect sfRoute "homepage" (/)
+Jul 30 18:07:46 symfony [info] {sfPatternRouting} Connect sfRoute "default_index" (/:module)
+Jul 30 18:07:46 symfony [info] {sfPatternRouting} Connect sfRoute "default" (/:module/:action/*)
+Jul 30 18:07:46 symfony [info] {sfPatternRouting} Match route "homepage" (/) for / with parameters array (  'module' => 'login',  'action' => 'index',)
+Jul 30 18:25:48 symfony [info] {sfPatternRouting} Connect sfRoute "homepage" (/)
+Jul 30 18:25:48 symfony [info] {sfPatternRouting} Connect sfRoute "default_index" (/:module)
+Jul 30 18:25:48 symfony [info] {sfPatternRouting} Connect sfRoute "default" (/:module/:action/*)
+Jul 30 18:25:48 symfony [info] {sfPatternRouting} Match route "homepage" (/) for / with parameters array (  'module' => 'login',  'action' => 'index',)
+Jul 30 18:28:02 symfony [info] {sfPatternRouting} Connect sfRoute "homepage" (/)
+Jul 30 18:28:02 symfony [info] {sfPatternRouting} Connect sfRoute "default_index" (/:module)
+Jul 30 18:28:02 symfony [info] {sfPatternRouting} Connect sfRoute "default" (/:module/:action/*)
+Jul 30 18:28:02 symfony [info] {sfPatternRouting} Match route "homepage" (/) for / with parameters array (  'module' => 'login',  'action' => 'index',)
+Jul 30 18:31:00 symfony [info] {sfPatternRouting} Connect sfRoute "homepage" (/)
+Jul 30 18:31:00 symfony [info] {sfPatternRouting} Connect sfRoute "default_index" (/:module)
+Jul 30 18:31:00 symfony [info] {sfPatternRouting} Connect sfRoute "default" (/:module/:action/*)
+Jul 30 18:31:00 symfony [info] {sfPatternRouting} Match route "homepage" (/) for / with parameters array (  'module' => 'login',  'action' => 'index',)
+Jul 30 18:31:01 symfony [info] {sfFilterChain} Executing filter "sfRenderingFilter"
+Jul 30 18:31:01 symfony [info] {sfFilterChain} Executing filter "sfBasicSecurityFilter"
+Jul 30 18:31:01 symfony [info] {sfFilterChain} Executing filter "sfCommonFilter"
+Jul 30 18:31:01 symfony [info] {sfFilterChain} Executing filter "sfValidationExecutionFilter"
+Jul 30 18:31:01 symfony [info] {loginActions} Call "loginActions->executeIndex()"
+Jul 30 18:31:01 symfony [info] {sfPHPView} Render "/var/www/facturacion/apps/venta/modules/login/templates/indexSuccess.php"
+Jul 30 18:31:01 symfony [info] {sfPHPView} Decorate content with "/var/www/facturacion/apps/venta/templates/login.php"
+Jul 30 18:31:01 symfony [info] {sfPHPView} Render "/var/www/facturacion/apps/venta/templates/login.php"
+Jul 30 18:31:01 symfony [info] {sfWebResponse} Send status "HTTP/1.1 200 OK"
+Jul 30 18:31:01 symfony [info] {sfWebResponse} Send header "Content-Type: text/html; charset=utf-8"
+Jul 30 18:31:01 symfony [info] {sfWebDebugLogger} Configuration 511.26 ms (11)
+Jul 30 18:31:01 symfony [info] {sfWebDebugLogger} Action "login/index" 0.97 ms (1)
+Jul 30 18:31:01 symfony [info] {sfWebDebugLogger} View "Success" for "login/index" 103.23 ms (1)
+Jul 30 18:31:01 symfony [info] {sfWebResponse} Send content (32105 o)
+Jul 30 18:31:02 symfony [info] {sfPatternRouting} Connect sfRoute "homepage" (/)
+Jul 30 18:31:02 symfony [info] {sfPatternRouting} Connect sfRoute "default_index" (/:module)
+Jul 30 18:31:02 symfony [info] {sfPatternRouting} Connect sfRoute "default" (/:module/:action/*)
+Jul 30 18:31:02 symfony [info] {sfPatternRouting} Match route "homepage" (/) for / with parameters array (  'module' => 'login',  'action' => 'index',)
+Jul 30 18:31:02 symfony [info] {sfFilterChain} Executing filter "sfRenderingFilter"
+Jul 30 18:31:02 symfony [info] {sfFilterChain} Executing filter "sfBasicSecurityFilter"
+Jul 30 18:31:02 symfony [info] {sfFilterChain} Executing filter "sfCommonFilter"
+Jul 30 18:31:02 symfony [info] {sfFilterChain} Executing filter "sfValidationExecutionFilter"
+Jul 30 18:31:02 symfony [info] {loginActions} Call "loginActions->executeIndex()"
+Jul 30 18:31:02 symfony [info] {sfPHPView} Render "/var/www/facturacion/apps/venta/modules/login/templates/indexSuccess.php"
+Jul 30 18:31:02 symfony [info] {sfPHPView} Decorate content with "/var/www/facturacion/apps/venta/templates/login.php"
+Jul 30 18:31:02 symfony [info] {sfPHPView} Render "/var/www/facturacion/apps/venta/templates/login.php"
+Jul 30 18:31:02 symfony [info] {sfWebResponse} Send status "HTTP/1.1 200 OK"
+Jul 30 18:31:02 symfony [info] {sfWebResponse} Send header "Content-Type: text/html; charset=utf-8"
+Jul 30 18:31:02 symfony [info] {sfWebDebugLogger} Configuration 2.10 ms (10)
+Jul 30 18:31:02 symfony [info] {sfWebDebugLogger} Action "login/index" 0.67 ms (1)
+Jul 30 18:31:02 symfony [info] {sfWebDebugLogger} View "Success" for "login/index" 4.96 ms (1)
+Jul 30 18:31:02 symfony [info] {sfWebResponse} Send content (32119 o)
+Jul 30 18:31:03 symfony [info] {sfPatternRouting} Connect sfRoute "homepage" (/)
+Jul 30 18:31:03 symfony [info] {sfPatternRouting} Connect sfRoute "default_index" (/:module)
+Jul 30 18:31:03 symfony [info] {sfPatternRouting} Connect sfRoute "default" (/:module/:action/*)
+Jul 30 18:31:03 symfony [info] {sfPatternRouting} Match route "default_index" (/:module) for /captcha with parameters array (  'module' => 'captcha',  'action' => 'index',)
+Jul 30 18:31:03 symfony [info] {sfFrontWebController} Action "captcha/index" does not exist
+Jul 30 18:31:03 symfony [err] {sfError404Exception} Action "captcha/index" does not exist.
+Jul 30 18:31:03 symfony [info] {sfWebResponse} Send status "HTTP/1.1 404 Not Found"
+Jul 30 18:31:03 symfony [info] {sfWebResponse} Send header "Content-Type: text/html; charset=utf-8"

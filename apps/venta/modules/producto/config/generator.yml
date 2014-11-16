@@ -1,0 +1,5 @@
+generator:
+  class:              sfPropelAdminGenerator
+  param:
+    model_class:      T07Producto
+    theme:            default
